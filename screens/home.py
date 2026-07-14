@@ -1,6 +1,7 @@
 import pygame
 import math
 import colorsys
+from planets import Planet
 
 pygame.init()
 
@@ -8,8 +9,12 @@ pygame.init()
 # create font once to avoid recreating every frame
 font = pygame.font.Font("assets/fonts/ZenDots-Regular.ttf", 80)
 
+# create the planet once so its orbit state persists across frames
+earth = Planet("Earth", 5.972e24, 20, (78, 128, 62), 100, 0.5, 0)
+moon = Planet("Moon", 7.348e22, 5, (200, 200, 200), 30, 1.0, 0)
 
-def homeScreen(screen):
+
+def homeScreen(screen, clock):
     # draw the home screen
     screen.fill((20, 20, 30))
 
@@ -26,10 +31,17 @@ def homeScreen(screen):
     screen.blit(title, (screen.get_width() / 2 - title.get_width() / 2, 100 + bob))
 
     playButton = font.render("Play", True, (44, 255, 5))
-    # draw only the border of the button (width=3) and use integer rect
-    btn_x = int(screen.get_width() / 2 - playButton.get_width() / 2 - 20)
-    btn_y = 320
-    btn_w = playButton.get_width() + 40
-    btn_h = playButton.get_height() + 20
-    pygame.draw.rect(screen, (255, 255, 255), (btn_x, btn_y, btn_w, btn_h), 3)
-    screen.blit(playButton, (screen.get_width() / 2 - playButton.get_width() / 2, 330))
+    screen.blit(playButton, (screen.get_width() / 2 - playButton.get_width() / 2, 500))
+    pygame.draw.rect(screen, (255, 255, 255), (screen.get_width() / 2 - playButton.get_width() /  2 - 10, 500 - 10, playButton.get_width() + 20, playButton.get_height() + 20), 3)
+
+    # creating solar system
+
+    pygame.draw.circle(screen, (255, 255, 0), (screen.get_width() / 2 - 100, screen.get_height() / 2), 40)  # Sun
+
+    earth.update_position(clock.get_time() / 1000.0)
+    earth.draw(screen, screen.get_width() / 2 - 100, screen.get_height() / 2)
+    moon.update_position(clock.get_time() / 1000.0)
+    moon.draw(screen, *earth.get_position(screen.get_width() / 2 - 100, screen.get_height() / 2))
+
+
+
