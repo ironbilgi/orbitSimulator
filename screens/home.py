@@ -28,7 +28,7 @@ neptune = Planet("Neptune", 1.024e26, 20, (0, 0, 255),
                  350, 0.08, 0, False, True)
 
 
-def homeScreen(screen, clock):
+def homeScreen(screen, clock, currentScreen):
     # draw the home screen
     screen.fill((20, 20, 30))
 
@@ -42,11 +42,35 @@ def homeScreen(screen, clock):
     color = (int(r * 255), int(g * 255), int(b * 255))
 
     title = font.render("Orbit Simulator", True, color)
+
+    if not hasattr(homeScreen, "button_scale"):
+        homeScreen.button_scale = 1.0
+
+    #Interactiviy for the play button
+    #First grabs the position of mouse, get_pos() returns a tuple of (x, y) coordinates of the mouse cursor
+    #Hover_rect is the area of the play button
+    #Checks when mouse is hovering over the play button, returns True or False
+    mouse_x, mouse_y = pygame.mouse.get_pos()
+    hover_rect = pygame.Rect(screen.get_width() / 2 - 120, 500 - 30, 240, 100)
+    hovered = hover_rect.collidepoint(mouse_x, mouse_y)
+
+    #If true, the button will scale up to 1.12, otherwise it will scale back down to 1.0
+    #When not hovered, (1.0 - 1.0) * 0.2 = 0, so the button_scale will remain at 1.0
+    target_scale = 1.12 if hovered else 1.0
+    homeScreen.button_scale += (target_scale - homeScreen.button_scale) * 0.2
+    #Renders the play button text and scales it according to the current button_scale
     playButton = font.render("Play", True, (44, 255, 5))
+    #creates a new play button surface that is scaled by the current button_scale
+    #so if not hovered, stays the same
+    scaled_play_button = pygame.transform.scale_by(
+        playButton, homeScreen.button_scale)
+    button_x = screen.get_width() / 2 - scaled_play_button.get_width() / 2
+    button_y = 500 - 8 * (homeScreen.button_scale - 1.0)
 
-    #Random Stars
+    # Random Stars
 
-    pygame.draw.circle(screen, (255, 255, 255), (random.randint(0, screen.get_width()), random.randint(0, screen.get_height())), 1)
+    pygame.draw.circle(screen, (255, 255, 255), (random.randint(
+        0, screen.get_width()), random.randint(0, screen.get_height())), 1)
     # Draw the solar system first so the UI can appear on top when they overlap
     pygame.draw.circle(screen, (180, 150, 80), (screen.get_width(
     ) / 2, screen.get_height() / 2), 40)  # Sun
@@ -91,8 +115,12 @@ def homeScreen(screen, clock):
     # Draw the UI text and button last so they appear on top
     screen.blit(title, (screen.get_width() / 2 -
                 title.get_width() / 2, 100 + bob))
-    screen.blit(playButton, (screen.get_width() /
-                2 - playButton.get_width() / 2, 500))
-    pygame.draw.rect(screen, (44, 255, 5), (screen.get_width() / 2 - playButton.get_width() /
-                     2 - 10, 500 - 10, playButton.get_width() + 20, playButton.get_height() + 20), 3)
+    screen.blit(scaled_play_button, (button_x, button_y))
+    #still maintains the padding, but now the rectangle is drawn around the scaled button, so it will always be centered and have the same padding regardless of the button's scale
+    pygame.draw.rect(screen, (44, 255, 5), (button_x - 10, button_y - 10,
+                     scaled_play_button.get_width() + 20, scaled_play_button.get_height() + 20), 3)
+    
+    if hovered and pygame.mouse.get_pressed()[0]:  # Check if left mouse button is pressed
+        currentScreen = "SIMULATION"  # Change the current screen to "SIMULATION"
 
+    return currentScreen  # Return the current screen state for the main loop

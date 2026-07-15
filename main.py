@@ -1,8 +1,10 @@
 import pygame
 from screens.home import homeScreen
+from screens.simulation import simulationScreen
 # initialize pygame
 pygame.init()
 # initialize the screen
+
 screen = pygame.display.set_mode((1280, 720))
 # The top bar of the window will say "Orbit Simulator"
 pygame.display.set_caption("Orbit Simulator")
@@ -22,7 +24,9 @@ while running:
             running = False
 
     if currentScreen == "HOME":
-        homeScreen(screen, clock)
+        currentScreen = homeScreen(screen, clock, currentScreen)
+    if currentScreen == "SIMULATION":
+        currentScreen = simulationScreen(screen, clock, currentScreen)
 
     pygame.display.flip()
     clock.tick(60)
