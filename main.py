@@ -19,14 +19,15 @@ currentTrack = pygame.mixer.Sound(
 currentTrack.set_volume(0.1)
 currentTrack.play(-1)  # Loop indefinitely
 while running:
-    for event in pygame.event.get():
+    events = pygame.event.get()
+    for event in events:
         if event.type == pygame.QUIT:
             running = False
 
     if currentScreen == "HOME":
         currentScreen = homeScreen(screen, clock, currentScreen)
     if currentScreen == "SIMULATION":
-        currentScreen = simulationScreen(screen, clock, currentScreen)
+        currentScreen = simulationScreen(screen, clock, currentScreen, events)
 
     pygame.display.flip()
     clock.tick(60)

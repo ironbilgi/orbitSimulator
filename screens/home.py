@@ -3,7 +3,7 @@ import random
 import pygame
 import math
 import colorsys
-from planets import Planet
+from classes.planets import Planet
 
 pygame.init()
 
