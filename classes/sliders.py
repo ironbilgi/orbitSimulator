@@ -4,12 +4,13 @@ import pygame
 class Dropdown:
     """A simple dropdown menu for choosing an option."""
 
-    def __init__(self, x, y, width, height, options, default_index=0):
+    def __init__(self, x, y, width, height, options, default_index=0, data=None):
         self.x = x
         self.y = y
         self.width = width
         self.height = height
         self.options = options
+        self.data = data or {}  # Dictionary to store additional data like mass
         self.selected_index = default_index
         self.open = False
 
@@ -64,6 +65,14 @@ class Dropdown:
 
     def get_selected(self):
         return self.options[self.selected_index]
+
+    def get_data(self, key=None):
+        """Get data for the selected option."""
+        selected = self.get_selected()
+        if selected in self.data:
+            if key is None:
+                return self.data[selected]
+            return self.data[selected].get(key)
 
 
 class Slider:
@@ -168,3 +177,8 @@ class Slider:
     def get_value(self):
         # Step 14: Return the current value.
         return self.value
+
+
+def drawSatellite(screen, x, y, altitude, radius=10, color=(255, 255, 255)):
+    """Draw a simple satellite as a circle on the screen."""
+    pygame.draw.circle(screen, color, (int(x), int(y) - int(altitude)), radius)

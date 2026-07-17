@@ -25,10 +25,10 @@ while running:
             running = False
 
     if currentScreen == "HOME":
-        currentScreen = homeScreen(screen, clock, currentScreen)
+        currentScreen = homeScreen(screen, clock, currentScreen, events)
     if currentScreen == "SIMULATION":
         currentScreen = simulationScreen(screen, clock, currentScreen, events)
-
+        
     pygame.display.flip()
     clock.tick(60)
 
