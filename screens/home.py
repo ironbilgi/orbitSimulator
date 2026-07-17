@@ -43,6 +43,7 @@ def homeScreen(screen, clock, currentScreen, events=None):
 
     title = font.render("Orbit Simulator", True, color)
 
+    # Creates aa button scale attribute for the homeScreen function if it doesn't exist yet
     if not hasattr(homeScreen, "button_scale"):
         homeScreen.button_scale = 1.0
 

@@ -13,6 +13,7 @@ class Dropdown:
         self.data = data or {}  # Dictionary to store additional data like mass
         self.selected_index = default_index
         self.open = False
+        self.selection_made = False
 
     def handle_event(self, event):
         if event.type != pygame.MOUSEBUTTONDOWN:
@@ -36,6 +37,7 @@ class Dropdown:
                 if option_rect.collidepoint(mouse_x, mouse_y):
                     self.selected_index = i
                     self.open = False
+                    self.selection_made = True
                     return
 
             self.open = False
@@ -65,6 +67,9 @@ class Dropdown:
 
     def get_selected(self):
         return self.options[self.selected_index]
+
+    def has_selection(self):
+        return self.selection_made
 
     def get_data(self, key=None):
         """Get data for the selected option."""

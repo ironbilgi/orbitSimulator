@@ -13,9 +13,12 @@ planet_dropdown = Dropdown(
         "Jupiter": {"mass": 1.898e27},
         "Moon": {"mass": 7.342e22}
     })
+button_font = pygame.font.Font("assets/fonts/ZenDots-Regular.ttf", 36)
 
 
 def simulationScreen(screen, clock, currentScreen, events):
+    if not hasattr(simulationScreen, "button_scale"):
+        simulationScreen.button_scale = 1.0
     # Fill the background so the scene is visible.
     screen.fill((0, 0, 0))
 
@@ -49,11 +52,12 @@ def simulationScreen(screen, clock, currentScreen, events):
     label_x = 820 + (220 - label.get_width()) // 2
     screen.blit(label, (label_x, 10))
     
-    # Display the mass of the selected planet below the dropdown
-    mass = planet_dropdown.get_data("mass")
-    if mass:
-        mass_text = font.render(f"Mass: {mass:.2e} kg", True, (200, 200, 200))
-        screen.blit(mass_text, (820, 90))
+    # Display the mass of the selected planet below the dropdown once a choice has been made.
+    if not planet_dropdown.open and planet_dropdown.has_selection():
+        mass = planet_dropdown.get_data("mass")
+        if mass:
+            mass_text = font.render(f"Mass: {mass:.2e} kg", True, (200, 200, 200))
+            screen.blit(mass_text, (820, 90))
 
     # Draw the sliders and their labels on the left side of the screen.
     speed_label = font.render("Speed", True, (255, 255, 255))
@@ -80,7 +84,24 @@ def simulationScreen(screen, clock, currentScreen, events):
         str(int(mass_slider.get_value())), True, (255, 255, 255))
     screen.blit(mass_value, (320, 320))
 
+    #Draw the satellite based on the altitude slider value, ensuring it stays within a reasonable range.
     drawSatellite(screen, 640, 360, max(50, min(300, (altitude_slider.get_value() - 160) / 35840 * 250 + 50)), radius=10, color=(255, 255, 255))
     print(f"Slider value: {speed_slider.get_value()}")  # Debugging line
 
+    # Draws the simulate button on the bottom center of the screen.
+    #Bad code repetitive, but its whatever for a final project/prototype
+    simulate_button = button_font.render("Simulate", True, (44, 255, 5))
+    button_rect = pygame.Rect(0, 0, simulate_button.get_width() + 20, simulate_button.get_height() + 20)
+    button_rect.center = (screen.get_width() // 2, 600)
+    hovered = button_rect.collidepoint(pygame.mouse.get_pos())
+
+    target_scale = 1.12 if hovered else 1.0
+    simulationScreen.button_scale += (target_scale - simulationScreen.button_scale) * 0.2
+
+    scaled_simulate_button = pygame.transform.scale_by(simulate_button, simulationScreen.button_scale)
+    scaled_rect = pygame.Rect(0, 0, scaled_simulate_button.get_width() + 20, scaled_simulate_button.get_height() + 20)
+    scaled_rect.center = (screen.get_width() // 2, 600)
+
+    screen.blit(scaled_simulate_button, (scaled_rect.x + 10, scaled_rect.y + 10))
+    pygame.draw.rect(screen, (44, 255, 5), scaled_rect, 2)
     return currentScreen
