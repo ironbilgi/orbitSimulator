@@ -187,3 +187,82 @@ class Slider:
 def drawSatellite(screen, x, y, altitude, radius=10, color=(255, 255, 255)):
     """Draw a simple satellite as a circle on the screen."""
     pygame.draw.circle(screen, color, (int(x), int(y) - int(altitude)), radius)
+
+
+
+class OrbitalPhysics:
+    def __init__(self, gravitational_constant=0.5):
+        """Initializes the physics engine with a universe scale factor (G)."""
+        self.G = gravitational_constant
+
+    def calculate_gravity_acceleration(self, body_pos, planet_pos, planet_mass):
+        """
+        Applies Newton's Law of Universal Gravitation math.
+        Returns a Vector2 representing the acceleration pull for this frame.
+        """
+        # Force the planet position to be a Vector2, even if a tuple was passed in
+        planet_vector = pygame.math.Vector2(planet_pos)
+
+        # Then use 'planet_vector' for the rest of the math steps
+        direction = planet_vector - body_pos
+        # 1. Distance Math: Get the vector pointing from body to planet
+        distance = direction.length()
+        
+        # Crash safety: stop pulling if objects overlap to prevent infinite force glitches
+        if distance < 10:
+            return pygame.math.Vector2(0, 0)
+            
+        # 2. Direction Math: Normalize the vector to get a unit vector (length of 1)
+        direction_normalized = direction.normalize()
+        
+        # 3. Force Math: F = (G * M) / r^2
+        force_magnitude = (self.G * planet_mass) / (distance ** 2)
+        
+        # 4. Return the final acceleration vector
+        return direction_normalized * force_magnitude
+
+    def update_body(self, body_pos, body_vel, planet_pos, planet_mass):
+        """
+        Updates a body's position and velocity for the current real frame.
+        Modifies and returns the updated (position, velocity) vectors.
+        """
+        acceleration = self.calculate_gravity_acceleration(body_pos, planet_pos, planet_mass)
+        
+        # Step velocity, then step position (Euler Integration)
+        body_vel += acceleration
+        body_pos += body_vel
+        
+        return body_pos, body_vel
+
+    def get_orbit_projection(self, ship_pos, ship_vel, planet_pos, planet_mass, steps=250):
+        projection_points = []
+        status = "stable"  # Default status if nothing bad happens
+        
+        virtual_pos = pygame.math.Vector2(ship_pos)
+        virtual_vel = pygame.math.Vector2(ship_vel)
+        
+        for _ in range(steps):
+            direction = planet_pos - virtual_pos
+            distance = direction.length()
+            
+            # 1. CHECK FOR CRASH
+            # If the ship gets within 20 pixels of the planet's center, it hits it.
+            if distance < 20: 
+                status = "crashed"
+                break # Stop calculating further points since it hit the planet
+                
+            # 2. CHECK FOR ESCAPE (Optional)
+            # If it's incredibly far away (e.g., 2000+ pixels), it's leaving orbit.
+            if distance > 2000:
+                status = "escaped"
+                break
+            
+            # Standard physics steps
+            direction_normalized = direction.normalize()
+            force_magnitude = (self.G * planet_mass) / (distance ** 2)
+            virtual_vel += direction_normalized * force_magnitude
+            virtual_pos += virtual_vel
+            
+            projection_points.append((int(virtual_pos.x), int(virtual_pos.y)))
+            
+        return projection_points, status

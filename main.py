@@ -1,6 +1,7 @@
 import pygame
 from screens.home import homeScreen
 from screens.simulation import simulationScreen
+from classes.paths import resource_path
 # initialize pygame
 pygame.init()
 # initialize the screen
@@ -15,7 +16,7 @@ clock = pygame.time.Clock()
 currentScreen = "HOME"
 
 currentTrack = pygame.mixer.Sound(
-    "assets/soundTracks/audiopapkin-ambient-soundscapes-001-space-atmosphere-303246.mp3")
+    resource_path("assets/soundTracks/audiopapkin-ambient-soundscapes-001-space-atmosphere-303246.mp3"))
 currentTrack.set_volume(0.1)
 currentTrack.play(-1)  # Loop indefinitely
 while running:

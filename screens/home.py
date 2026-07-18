@@ -4,12 +4,13 @@ import pygame
 import math
 import colorsys
 from classes.planets import Planet
+from classes.paths import resource_path
 
 pygame.init()
 
 
 # create font once to avoid recreating every frame
-font = pygame.font.Font("assets/fonts/ZenDots-Regular.ttf", 80)
+font = pygame.font.Font(resource_path("assets/fonts/ZenDots-Regular.ttf"), 80)
 
 # create the planet once so its orbit state persists across frames
 mecury = Planet("Mercury", 3.285e23, 10,
